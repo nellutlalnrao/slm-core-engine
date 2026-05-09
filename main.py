@@ -1,5 +1,6 @@
 from core.session.session_manager import SessionManager
 from core.context.context_builder import ContextBuilder
+from core.token.token_limiter import decide_max_tokens
 from llama_cpp import Llama
 
 def main():
@@ -70,12 +71,15 @@ def main():
             "<|assistant|>\n"
         )
 
+        max_tokens = min(decide_max_tokens(q), 300)  # hard safety cap
         # -----------------------------
         # Inference
         # -----------------------------
         output = llm(
             prompt,
-            max_tokens=256,
+            max_tokens=max_tokens,
+            temperature=0.6,
+            top_p=0.9,
             stop=["<|user|>", "<|assistant|>", "<|context|>"]
         )
 
