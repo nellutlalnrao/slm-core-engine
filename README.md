@@ -19,3 +19,16 @@ Small language models are fast, efficient, and affordable — but they suffer fr
 - Reduced Hallucinations
 - Fully Offline & Private
 - Modular (Swap SLMs without redesign) & Extensible (Add tools (SQL, APIs, OS) / Extend memory and ranking policies independently)
+
+## System Architecture
+
+The Project starts supporting from System Configurations - 
+
+| **Component**  | **Specification** |
+| ---------- | ------------- |
+| **RAM** | 8 GB |
+| **CPU** | x64 (likely 4-8 cores) |
+| **GPU** | Intel UHD (CPU-only inference) |
+| **Storage** | NVMe SSD 466 GB |
+
+## Phase-1 Implementation
