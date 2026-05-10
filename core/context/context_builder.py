@@ -1,18 +1,23 @@
 from core.context.context_trimmer import ContextTrimmer
 from core.context.context_summarizer import ContextSummarizer
 
+from core.memory.memory_filter import MemoryFilter
 
 class ContextBuilder:
     def __init__(
         self,
         session_manager,
         max_prompt_tokens=3500,
-        recent_window=6
+        recent_window=6,
+        min_priority=5   # control knob
     ):
         self.session_manager = session_manager
         self.recent_window = recent_window
+        self.min_priority = min_priority
         self.trimmer = ContextTrimmer(max_prompt_tokens)
         self.summarizer = ContextSummarizer()
+        # Memory filter instance
+        self.memory_filter = MemoryFilter(threshold=self.min_priority)
 
     def build(self, session):
         # 1. Source of truth remains SessionManager
@@ -20,6 +25,13 @@ class ContextBuilder:
 
         if not messages:
             return ""
+
+        # APPLY MEMORY FILTER (REAL USAGE)
+        filtered_messages = self.memory_filter.filter(messages)
+
+        # fallback safety
+        if not filtered_messages:
+            filtered_messages = messages
 
         # 2. Sliding window
         recent_messages = messages[-self.recent_window:]

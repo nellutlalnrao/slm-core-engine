@@ -2,6 +2,9 @@ import uuid
 from core.session.models import Session, Message
 from core.session.session_store import SessionStore
 
+from core.memory.priority_scorer import PriorityScorer
+from core.memory.signal_classifier import tag_message
+
 MAX_RECENT_MESSAGES = 10   # sliding window
 
 
@@ -58,6 +61,19 @@ class SessionManager:
         Enforces sliding window.
         Persists session after update.
         """
+        # Enrichment layer
+        priority = PriorityScorer.score(content, role)
+        tags = tag_message(content)
+
+        # Enhanced message object
+        message = Message(
+            role=role,
+            content=content
+        )
+
+        # Attach dynamic metadata (safe extension)
+        message.priority = priority
+        message.tags = tags
 
         session.recent_messages.append(
             Message(role=role, content=content)
