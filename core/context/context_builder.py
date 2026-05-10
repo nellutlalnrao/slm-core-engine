@@ -3,7 +3,7 @@ from core.context.context_summarizer import ContextSummarizer
 
 from core.memory.memory_filter import MemoryFilter
 
-class ContextBuilder:
+class ContextBuilder: # Builds Context
     def __init__(
         self,
         session_manager,

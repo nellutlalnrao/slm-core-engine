@@ -1,5 +1,5 @@
 # ContextSummarizer is rule-based first (safe, fast, deterministic)
-class ContextSummarizer:
+class ContextSummarizer: # Compresses History
     def summarize(self, messages):
         important = []
 
