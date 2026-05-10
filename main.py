@@ -1,6 +1,5 @@
 from core.session.session_manager import SessionManager
 from core.context.context_builder import ContextBuilder
-# from core.token.token_limiter import decide_max_tokens
 from core.model.llm_client import LLMClient
 from core.completion.answer_orchestrator import AnswerOrchestrator
 from llama_cpp import Llama
@@ -81,33 +80,22 @@ def main():
         )
 
         # -----------------------------
-        # Auto-Completion Orchestrated Inference
+        # Phase-3: Orchestrated Completion
+        # (Answer length decided FIRST internally)
         # -----------------------------
-        # max_tokens = min(decide_max_tokens(q), 300)  # hard safety cap
         final_answer = orchestrator.get_complete_answer(
             question=prompt
         )
 
+        # Safety cleanup
         final_answer = final_answer.replace("<|context|>", "").strip()
 
         print(final_answer)
-        # -----------------------------
-        # Inference
-        # -----------------------------
-        # output = llm(
-        #    prompt,
-        #    max_tokens=max_tokens,
-        #    temperature=0.6,
-        #    top_p=0.9,
-        #    stop=["<|user|>", "<|assistant|>"]
-        #)#
 
-        #answer = output["choices"][0]["text"].strip()
-        #answer = answer.replace("<|context|>", "").strip() # Safety cleanup (in case model leaks tokens)
-        # print(answer)
-
-        # Save assistant response
-        sm.add_message(session, "assistant", final_answer)        
+        # -----------------------------
+        # Save Assistant Response
+        # -----------------------------
+        sm.add_message(session, "assistant", final_answer)
 
 if __name__ == "__main__":
     main()
