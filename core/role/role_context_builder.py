@@ -1,19 +1,21 @@
-from core.role.role_profiles import ROLE_PROFILES
+# core/role/role_context_builder.py
 
 class RoleContextBuilder:
 
     @staticmethod
-    def build(role: str, base_context: str) -> str:
-        profile = ROLE_PROFILES.get(role, ROLE_PROFILES["default"])
+    def build(role, context):
+        """
+        Inject role instruction into structured context.
+        Input:  context -> list of {role, content}
+        Output: context -> list of {role, content}
+        """
 
-        role_instruction = f"""
-You are operating in ROLE: {role}
+        if not role or not context:
+            return context
 
-Style Guide:
-- Tone: {profile['style']}
-- Verbosity: {profile['verbosity']}
+        # Merge role into existing system message
+        if context[0]["role"] == "system":
+            context[0]["content"] += f" You are acting as a {role}."
+            return context
 
-Follow role strictly while answering.
-"""
-
-        return role_instruction + "\n\n" + base_context
+        return context
