@@ -4,6 +4,8 @@ from core.completion.autocomplete_orchestrator import AutocompleteOrchestrator
 from core.role.role_detector import RoleDetector
 from core.role.role_context_builder import RoleContextBuilder
 
+from core.context_guard.drift_detector import DriftDetector
+
 class AnswerOrchestrator:
     """
     Role-Aware Answer Orchestration
@@ -17,6 +19,7 @@ class AnswerOrchestrator:
     def __init__(self, llm_engine,  session_manager=None):
         self.autocomplete = AutocompleteOrchestrator(llm_engine)
         self.session_manager = session_manager  # optional but recommended
+        self.drift_detector = DriftDetector()
 
     def get_complete_answer(self, question: str, session_id: str = None) -> str:
         """
@@ -50,4 +53,14 @@ class AnswerOrchestrator:
         # -------------------------------------------------
         # Autocomplete with role-aware profile
         # -------------------------------------------------
-        return self.autocomplete.complete(question, profile)
+        answer = self.autocomplete.complete(question, profile)
+
+        # -------------------------------------------------
+        # Drift detection ONLY on final answer
+        # -------------------------------------------------
+        try:
+            self.drift_detector.check(question, answer)
+        except RuntimeError:
+            return "Answer halted due to topic inconsistency."
+
+        return answer
